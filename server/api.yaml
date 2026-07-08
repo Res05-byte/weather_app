@@ -1,0 +1,100 @@
+openapi: 3.0.3
+info:
+  title: Weather App API
+  description: REST API for current weather and forecast data
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:4000/api/v1
+    description: Local development server
+
+tags:
+  - name: Weather
+    description: Weather data endpoints
+
+paths:
+
+  /weather/current:
+    get:
+      tags: [Weather]
+      summary: Get current weather for a city
+      operationId: getCurrentWeather
+      parameters:
+        - name: city
+          in: query
+          required: true
+          schema:
+            type: string
+          example: Kathmandu
+      responses:
+        '200':
+          description: Current weather data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeatherResponse'
+        '404':
+          description: City not found
+        '500':
+          description: Server error
+
+  /weather/forecast:
+    get:
+      tags: [Weather]
+      summary: Get 5-day forecast for a city
+      operationId: getForecast
+      parameters:
+        - name: city
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Forecast data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForecastResponse'
+
+components:
+  schemas:
+    WeatherResponse:
+      type: object
+      properties:
+        city:
+          type: string
+        temperature:
+          type: number
+        feels_like:
+          type: number
+        humidity:
+          type: number
+        description:
+          type: string
+        icon:
+          type: string
+        wind_speed:
+          type: number
+
+    ForecastResponse:
+      type: object
+      properties:
+        city:
+          type: string
+        days:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+              high:
+                type: number
+              low:
+                type: number
+              description:
+                type: string
+              icon:
+                type: string
+                

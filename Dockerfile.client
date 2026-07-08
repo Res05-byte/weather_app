@@ -1,0 +1,35 @@
+# ── Stage 1: Build ───────────────────────────────────────────────────────────
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Base path this app is served under. Empty ("") for root deploys like
+# local docker-compose. Set to "/reshma" (no trailing slash) when building
+# for the shared ALB, e.g.:
+#   docker build -f Dockerfile.client --build-arg PUBLIC_URL=/reshma .
+ARG PUBLIC_URL=""
+ENV PUBLIC_URL=${PUBLIC_URL}
+
+# Install dependencies first (better layer caching)
+COPY package.json package-lock.json ./
+RUN npm ci --legacy-peer-deps
+
+# Copy source and build
+COPY public/ public/
+COPY src/ src/
+RUN npm run build
+
+# ── Stage 2: Serve with Nginx ─────────────────────────────────────────────────
+FROM nginx:stable-alpine
+
+# Copy built assets
+COPY --from=builder /app/build /usr/share/nginx/html
+
+# Custom nginx config that proxies /api calls to the backend
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
+EXPOSE 80
+
+CMD ["/docker-entrypoint.sh"]

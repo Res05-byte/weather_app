@@ -1,0 +1,29 @@
+services:
+
+  # ── Express backend ──────────────────────────────────────────────────────────
+  server:
+    build:
+      context: ./server/weather-server
+      dockerfile: Dockerfile.server
+    image: weather-server
+    restart: unless-stopped
+    env_file:
+      - ./server/weather-server/.env        # contains PORT and OPENWEATHER_API_KEY
+    # Alternatively, pass secrets without committing .env:
+    # environment:
+    #   - PORT=4000
+    #   - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
+    expose:
+      - "4000"                              # internal only; client proxies through nginx
+
+  # ── React frontend (nginx) ──────────────────────────────────────────────────
+  client:
+    build:
+      context: ./client
+      dockerfile: ../Dockerfile.client      # or put Dockerfile.client next to this file
+    image: weather-client
+    restart: unless-stopped
+    ports:
+      - "80:80"                             # browse at http://localhost
+    depends_on:
+      - server
