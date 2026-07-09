@@ -44,6 +44,10 @@ resource "aws_ecs_task_definition" "backend" {
       portMappings = [
         { containerPort = var.frontend_port, protocol = "tcp" }
       ]
+      environment = [
+        { name = "BACKEND_HOST", value = "127.0.0.1" },
+        { name = "BASE_PREFIX", value = "/${var.path_prefix}" }
+      ]
       dependsOn = [
         { containerName = "server", condition = "START" }
       ]
