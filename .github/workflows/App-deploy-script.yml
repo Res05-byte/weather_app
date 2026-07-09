@@ -60,24 +60,31 @@ jobs:
 
       - name: Force new deployment
         env:
-          ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
-          ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
+          ECS_CLUSTER: ${{ secrets.ECS_CLUSTER || 'weather-app' }}
+          ECS_SERVICE: ${{ secrets.ECS_SERVICE || 'weather-app-reshma' }}
         run: |
-          if [ -z "$ECS_CLUSTER" ] || [ -z "$ECS_SERVICE" ]; then
-            echo "ECS_CLUSTER or ECS_SERVICE secret is missing."
-            exit 1
-          fi
+          set -euo pipefail
 
-          aws ecs describe-clusters --clusters "$ECS_CLUSTER" --region "$AWS_REGION" >/tmp/ecs-clusters.json
-          aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" --region "$AWS_REGION" >/tmp/ecs-services.json
+          echo "Using ECS cluster: $ECS_CLUSTER"
+          echo "Using ECS service: $ECS_SERVICE"
+
+          aws ecs describe-clusters --clusters "$ECS_CLUSTER" --region "$AWS_REGION" > /tmp/ecs-clusters.json
 
           if ! grep -q '"status": "ACTIVE"' /tmp/ecs-clusters.json; then
             echo "ECS cluster '$ECS_CLUSTER' is not active or does not exist."
+            cat /tmp/ecs-clusters.json
             exit 1
           fi
 
+          aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" --region "$AWS_REGION" > /tmp/ecs-services.json || {
+            echo "ECS service '$ECS_SERVICE' was not found in cluster '$ECS_CLUSTER'."
+            aws ecs list-services --cluster "$ECS_CLUSTER" --region "$AWS_REGION"
+            exit 1
+          }
+
           if ! grep -q '"status": "ACTIVE"' /tmp/ecs-services.json; then
             echo "ECS service '$ECS_SERVICE' is not active or does not exist."
+            cat /tmp/ecs-services.json
             exit 1
           fi
 
