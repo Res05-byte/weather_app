@@ -1,15 +1,16 @@
 {
   "name": "weather-server",
   "version": "1.0.0",
-  "main": "controllers/index.js",
+  "description": "Weather API server",
   "scripts": {
-  "start": "node controllers/index.js",
-  "dev": "nodemon controllers/index.js"
-},
+    "start": "node controllers/index.js",
+    "dev": "nodemon controllers/index.js",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "axios": "^1.16.1",
     "cors": "^2.8.6",
@@ -20,6 +21,8 @@
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.14",
+    "supertest": "^6.3.3"
   }
 }
