@@ -61,12 +61,11 @@ jobs:
       - name: Force new deployment
         env:
           ECS_CLUSTER: ${{ secrets.ECS_CLUSTER || 'weather-app' }}
-          ECS_SERVICE: ${{ secrets.ECS_SERVICE || 'weather-app-reshma' }}
+          ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
         run: |
           set -euo pipefail
 
           echo "Using ECS cluster: $ECS_CLUSTER"
-          echo "Using ECS service: $ECS_SERVICE"
 
           aws ecs describe-clusters --clusters "$ECS_CLUSTER" --region "$AWS_REGION" > /tmp/ecs-clusters.json
 
@@ -76,19 +75,34 @@ jobs:
             exit 1
           fi
 
-          aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" --region "$AWS_REGION" > /tmp/ecs-services.json || {
-            echo "ECS service '$ECS_SERVICE' was not found in cluster '$ECS_CLUSTER'."
+          if [ -n "$ECS_SERVICE" ]; then
+            SERVICE_NAME="$ECS_SERVICE"
+          else
+            SERVICE_NAMES=$(aws ecs list-services --cluster "$ECS_CLUSTER" --region "$AWS_REGION" --query 'serviceArns' --output text | awk -F'/' '{print $NF}')
+            SERVICE_NAME=$(echo "$SERVICE_NAMES" | head -n 1)
+          fi
+
+          if [ -z "$SERVICE_NAME" ]; then
+            echo "No ECS service was found in cluster '$ECS_CLUSTER'."
+            aws ecs list-services --cluster "$ECS_CLUSTER" --region "$AWS_REGION"
+            exit 1
+          fi
+
+          echo "Using ECS service: $SERVICE_NAME"
+
+          aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$SERVICE_NAME" --region "$AWS_REGION" > /tmp/ecs-services.json || {
+            echo "ECS service '$SERVICE_NAME' was not found in cluster '$ECS_CLUSTER'."
             aws ecs list-services --cluster "$ECS_CLUSTER" --region "$AWS_REGION"
             exit 1
           }
 
           if ! grep -q '"status": "ACTIVE"' /tmp/ecs-services.json; then
-            echo "ECS service '$ECS_SERVICE' is not active or does not exist."
+            echo "ECS service '$SERVICE_NAME' is not active or does not exist."
             cat /tmp/ecs-services.json
             exit 1
           fi
 
           aws ecs update-service \
             --cluster "$ECS_CLUSTER" \
-            --service "$ECS_SERVICE" \
+            --service "$SERVICE_NAME" \
             --force-new-deployment
