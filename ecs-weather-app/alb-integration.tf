@@ -41,19 +41,19 @@ resource "aws_security_group" "service" {
 
 resource "aws_lb_target_group" "app" {
   name        = "${var.app_name}-reshma-tg"
-  port        = var.frontend_port
+  port        = 4000
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
   target_type = "ip" # required for Fargate awsvpc networking
 
   health_check {
-    path                = "/"
-    healthy_threshold   = 2
-    unhealthy_threshold = 3
-    interval            = 30
-    timeout             = 5
-    matcher             = "200"
-  }
+  path                = "/health"
+  healthy_threshold   = 2
+  unhealthy_threshold = 3
+  interval            = 30
+  timeout             = 5
+  matcher             = "200"
+}
 
   tags = {
     Name = "${var.app_name}-reshma-tg"
