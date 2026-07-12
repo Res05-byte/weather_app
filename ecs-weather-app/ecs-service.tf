@@ -78,8 +78,8 @@ resource "aws_ecs_service" "app" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.app.arn
-    container_name   = "client"
-    container_port   = var.frontend_port
+    container_name   = "server"
+    container_port   = var.backend_port
   }
 
   # Ensure the listener rule (and thus target group registration) exists
