@@ -20,7 +20,7 @@ resource "aws_security_group" "service" {
   vpc_id      = var.vpc_id
 
   ingress {
-    description     = "From shared ALB"
+    description     = "From shared ALB to backend"
     from_port       = var.frontend_port
     to_port         = var.frontend_port
     protocol        = "tcp"
