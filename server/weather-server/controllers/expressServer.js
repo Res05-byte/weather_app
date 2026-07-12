@@ -11,7 +11,7 @@ const config = require('../config');
 const WeatherController = require('./WeatherController');
 
 // Load OpenAPI spec for Swagger UI
-const specPath = path.join(__dirname, '..', '..', 'api.yaml');
+const specPath = path.join(__dirname, '..', 'api.yaml');
 const apiSpec  = jsYaml.load(fs.readFileSync(specPath, 'utf8'));
 
 const app = express();
