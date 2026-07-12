@@ -21,8 +21,8 @@ resource "aws_security_group" "service" {
 
   ingress {
     description     = "From shared ALB to backend"
-    from_port       = var.frontend_port
-    to_port         = var.frontend_port
+    from_port       = var.backend_port
+    to_port         = var.backend_port
     protocol        = "tcp"
     security_groups = data.aws_lb.existing.security_groups
   }
