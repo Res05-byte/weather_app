@@ -33,27 +33,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        if: env.AWS_ACCESS_KEY_ID != '' && env.AWS_SECRET_ACCESS_KEY != ''
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Setup Terraform
-        if: env.AWS_ACCESS_KEY_ID != '' && env.AWS_SECRET_ACCESS_KEY != '' && env.S3_BUCKET_NAME != ''
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.5.0
-
-      - name: Create frontend S3 bucket
-        if: env.AWS_ACCESS_KEY_ID != '' && env.AWS_SECRET_ACCESS_KEY != '' && env.S3_BUCKET_NAME != ''
-        working-directory: ./frontend-cdn
-        run: |
-          terraform init
-          terraform apply -auto-approve -var="bucket_name=$S3_BUCKET_NAME" -var="aws_region=$AWS_REGION"
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -79,11 +58,10 @@ jobs:
             aws configure set default.region "$AWS_DEFAULT_REGION"
             aws s3 sync build/ "s3://$S3_BUCKET_NAME" --delete
 
-            if [ -n "$CLOUDFRONT_DISTRIBUTION_ID" ]; then
+              if [ -n "$CLOUDFRONT_DISTRIBUTION_ID" ]; then
               aws cloudfront create-invalidation \
                 --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" \
                 --paths "/*"
+            else
+              echo "Skipping CloudFront invalidation because no distribution ID is configured."
             fi
-          else
-            echo "AWS deployment skipped because required secrets are not set."
-          fi
