@@ -1,5 +1,5 @@
 'use strict';
-const WeatherService = require('../services/WeatherSevice');
+const WeatherService = require('../services/WeatherService');
 
 class WeatherController {
 
