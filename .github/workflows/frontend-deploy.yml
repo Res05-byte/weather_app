@@ -49,26 +49,24 @@ jobs:
       - name: Build frontend
         run: npm run build
 
-      - name: Deploy to S3 and invalidate CloudFront
+           - name: Deploy to S3 and invalidate CloudFront
         run: |
-          - name: Deploy to S3 and invalidate CloudFront
-  run: |
-     if [ -n "$AWS_ACCESS_KEY_ID" ] && [ -n "$AWS_SECRET_ACCESS_KEY" ] && [ -n "$S3_BUCKET_NAME" ]; then
-      export AWS_DEFAULT_REGION="$AWS_REGION"
+          if [ -n "$AWS_ACCESS_KEY_ID" ] && [ -n "$AWS_SECRET_ACCESS_KEY" ] && [ -n "$S3_BUCKET_NAME" ]; then
+            export AWS_DEFAULT_REGION="$AWS_REGION"
 
-      aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
-      aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
-      aws configure set default.region "$AWS_DEFAULT_REGION"
+            aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
+            aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
+            aws configure set default.region "$AWS_DEFAULT_REGION"
 
-      aws s3 sync build/ "s3://$S3_BUCKET_NAME" --delete
+            aws s3 sync build/ "s3://$S3_BUCKET_NAME" --delete
 
-      if [ -n "$CLOUDFRONT_DISTRIBUTION_ID" ]; then
-        aws cloudfront create-invalidation \
-          --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" \
-          --paths "/*"
-      else
-        echo "Skipping CloudFront invalidation because no distribution ID is configured."
-      fi
-     else
-      echo "AWS deployment skipped because required secrets are not set."
-    fi
+            if [ -n "$CLOUDFRONT_DISTRIBUTION_ID" ]; then
+              aws cloudfront create-invalidation \
+                --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" \
+                --paths "/*"
+            else
+              echo "Skipping CloudFront invalidation because no distribution ID is configured."
+            fi
+          else
+            echo "AWS deployment skipped because required secrets are not set."
+          fi
