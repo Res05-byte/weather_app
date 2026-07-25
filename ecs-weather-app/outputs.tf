@@ -1,10 +1,10 @@
 output "cluster_name" {
-  value = aws_ecs_cluster.this.name
+  value = data.aws_ecs_cluster.platform.cluster_name
 }
 
 output "task_definition" {
   value = aws_ecs_task_definition.backend.family
-}# --- Append these to your existing ecs-weather-app/outputs.tf ---
+}
 
 output "service_url" {
   description = "URL to reach your app through the shared ALB"

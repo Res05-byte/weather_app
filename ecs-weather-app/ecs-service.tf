@@ -13,7 +13,7 @@ resource "aws_ecs_task_definition" "backend" {
   network_mode             = "awsvpc"
   cpu                      = var.task_cpu
   memory                   = var.task_memory
-  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+  execution_role_arn = data.aws_iam_role.ecs_execution_role.arn
 
   # NOTE: both containers run in the SAME task, sharing one network
   # namespace (awsvpc mode) — just like they shared one docker-compose
@@ -65,7 +65,7 @@ resource "aws_ecs_task_definition" "backend" {
 
 resource "aws_ecs_service" "app" {
   name            = "${var.app_name}-reshma"
-  cluster         = aws_ecs_cluster.this.id
+  cluster = data.aws_ecs_cluster.platform.id
   task_definition = aws_ecs_task_definition.backend.arn
   desired_count   = var.desired_count
   launch_type     = "FARGATE"
@@ -77,10 +77,10 @@ resource "aws_ecs_service" "app" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.app.arn
-    container_name   = "server"
-    container_port   = var.backend_port
-  }
+  target_group_arn = aws_lb_target_group.app.arn
+  container_name   = "client"
+  container_port   = var.frontend_port
+}
 
   # Ensure the listener rule (and thus target group registration) exists
   # before ECS tries to attach tasks to it.
