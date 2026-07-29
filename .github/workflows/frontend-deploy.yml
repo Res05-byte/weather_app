@@ -108,6 +108,12 @@ jobs:
             --cluster "$ECS_CLUSTER" \
             --services "$ECS_SERVICE" \
             --region "$AWS_REGION"
+      
+      - name: Describe task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition reshma-app:6 \
+            --region "$AWS_REGION"
 
       - name: Show ECS task logs
         run: |
