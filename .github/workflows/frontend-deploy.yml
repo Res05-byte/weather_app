@@ -108,3 +108,15 @@ jobs:
             --cluster "$ECS_CLUSTER" \
             --services "$ECS_SERVICE" \
             --region "$AWS_REGION"
+
+      - name: Show ECS task logs
+        run: |
+          aws logs tail /ecs/reshma-app \
+            --since 30m \
+            --region "$AWS_REGION"
+
+      - name: Describe Target Health
+        run: |
+          aws elbv2 describe-target-health \
+            --target-group-arn arn:aws:elasticloadbalancing:ap-south-1:499133675579:targetgroup/reshma-app-tg/f127ae9428640b65 \
+            --region "$AWS_REGION"
