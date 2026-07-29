@@ -24,7 +24,7 @@ jobs:
       AWS_REGION: ${{ secrets.AWS_REGION || 'ap-south-1' }}
       ECR_REPOSITORY: ${{ secrets.ECR_FRONTEND_REPOSITORY || 'weather-app-frontend' }}
       ECS_CLUSTER: concproject-cluster
-      ECS_SERVICE: weather-app-reshma
+      ECS_SERVICE: reshma-app-service
 
     steps:
       - name: Checkout repository
