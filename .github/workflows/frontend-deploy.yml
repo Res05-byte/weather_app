@@ -70,8 +70,17 @@ jobs:
           docker push "$REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
           docker push "$REGISTRY/$ECR_REPOSITORY:latest"
 
-      - name: Force new ECS deployment
+      - name: List ECS services and deploy
         run: |
+          echo "Cluster: $ECS_CLUSTER"
+          echo "Expected service: $ECS_SERVICE"
+
+          echo "=== Services in cluster ==="
+          aws ecs list-services \
+            --cluster "$ECS_CLUSTER" \
+            --region "$AWS_REGION"
+
+          echo "=== Updating service ==="
           aws ecs update-service \
             --cluster "$ECS_CLUSTER" \
             --service "$ECS_SERVICE" \
