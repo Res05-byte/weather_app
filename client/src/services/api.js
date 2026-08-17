@@ -1,4 +1,17 @@
-const BASE_URL = "http://localhost:4000/api/v1";
+// Dynamically set base URL based on environment
+// Local development: http://localhost:4000/api/v1
+// Production (ALB): /reshma/api/v1 (which nginx rewrites to /api/v1)
+const getBaseUrl = () => {
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:4000/api/v1';
+  }
+  // Production: use the full path that nginx will rewrite
+  // This assumes the app is served under /reshma/
+  const pathPrefix = window.location.pathname.split('/')[1]; // Get 'reshma' from /reshma/...
+  return `/${pathPrefix}/api/v1`;
+};
+
+const BASE_URL = getBaseUrl();
 
 console.log("BASE_URL =", BASE_URL);
 
