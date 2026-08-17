@@ -20,14 +20,15 @@ app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use(morgan('dev'));
 
-// Swagger docs at /api-docs
+// Swagger docs at /api-docs and /reshma/api-docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(apiSpec));
+app.use('/reshma/api-docs', swaggerUi.serve, swaggerUi.setup(apiSpec));
 
 // Routes
-app.get('/api/v1/weather/current', WeatherController.getCurrentWeather);
-app.get('/api/v1/weather/forecast', WeatherController.getForecast);
+app.get(['/api/v1/weather/current', '/reshma/api/v1/weather/current'], WeatherController.getCurrentWeather);
+app.get(['/api/v1/weather/forecast', '/reshma/api/v1/weather/forecast'], WeatherController.getForecast);
 
 // Health check
-app.get('/health', (req, res) => res.json({ status: 'ok' }));
+app.get(['/health', '/reshma/health'], (req, res) => res.json({ status: 'ok' }));
 
 module.exports = app;

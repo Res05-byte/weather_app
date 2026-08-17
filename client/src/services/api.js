@@ -1,14 +1,18 @@
-// Dynamically set base URL based on environment
-// Local development: http://localhost:4000/api/v1
-// Production (ALB): /reshma/api/v1 (which nginx rewrites to /api/v1)
+// Use a path-aware base URL so the app works both locally and behind /reshma.
+// Local: http://localhost:4000/api/v1
+// ALB:   /reshma/api/v1
 const getBaseUrl = () => {
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+  if (isLocal) {
     return 'http://localhost:4000/api/v1';
   }
-  // Production: use the full path that nginx will rewrite
-  // This assumes the app is served under /reshma/
-  const pathPrefix = window.location.pathname.split('/')[1]; // Get 'reshma' from /reshma/...
-  return `/${pathPrefix}/api/v1`;
+
+  const currentPath = window.location.pathname || '/';
+  const hasPrefix = currentPath.startsWith('/reshma');
+  const prefix = hasPrefix ? '/reshma' : '';
+
+  return `${prefix}/api/v1`;
 };
 
 const BASE_URL = getBaseUrl();
