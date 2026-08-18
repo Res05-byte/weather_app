@@ -4,6 +4,6 @@ const config = require('../config');
 
 app.listen(config.port, config.host, () => {
   console.log(`✅ Weather API running`);
-  console.log(`   ➜ API  : http://${config.host}:${config.port}/api/v1`);
-  console.log(`   ➜ Docs : http://${config.host}:${config.port}/api-docs`);
+  console.log(`   ➜ API  : http://${config.host}:${config.port}${config.api.basePath}`);
+  console.log(`   ➜ Docs : http://${config.host}:${config.port}${config.api.docsPath}`);
 });
