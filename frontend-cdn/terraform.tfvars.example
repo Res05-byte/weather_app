@@ -1,5 +1,0 @@
-aws_region = "ap-south-1"
-environment = "dev"
-bucket_name = "weather-app-frontend-2026"
-# domain_name = ""
-# acm_certificate_arn = ""

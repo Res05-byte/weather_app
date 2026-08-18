@@ -1,0 +1,9 @@
+{
+  "name": "weather-app",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.js",
+    "dev:server": "npm --prefix server/weather-server start",
+    "dev:client": "npm --prefix client start"
+  }
+}

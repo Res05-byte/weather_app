@@ -9,24 +9,16 @@ function Home() {
   const [error, setError] = useState('');
 
   const search = async () => {
-    console.log("Search clicked");
-    console.log("City =", city);
-
     if (!city.trim()) return;
 
     setLoading(true);
     setError('');
 
     try {
-      console.log("Calling API...");
-
       const [w, f] = await Promise.all([
         weatherApi.getCurrent(city),
         weatherApi.getForecast(city),
       ]);
-
-      console.log("Weather:", w);
-      console.log("Forecast:", f);
 
       setWeather(w);
       setForecast(f);

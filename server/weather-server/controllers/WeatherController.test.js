@@ -1,9 +1,9 @@
 'use strict';
 const WeatherController = require('./WeatherController');
-const WeatherService = require('../services/WeatherSevice');
+const WeatherService = require('../services/WeatherService');
 
 // Mock WeatherService
-jest.mock('../services/WeatherSevice');
+jest.mock('../services/WeatherService');
 
 describe('WeatherController', () => {
   let req, res;

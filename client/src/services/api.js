@@ -1,11 +1,10 @@
-// Use a path-aware base URL so the app works both locally and behind /reshma.
-// Local: http://localhost:4000/api/v1
-// ALB:   /reshma/api/v1
+// Use a relative URL.  In development, Create React App proxies this to the
+// backend; in Docker, nginx proxies it.  This avoids the browser trying to
+// reach port 4000 directly when the frontend is served on port 80.
 const getBaseUrl = () => {
-  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-
-  if (isLocal) {
-    return 'http://localhost:4000/api/v1';
+  const configuredUrl = process.env.REACT_APP_API_BASE_URL;
+  if (configuredUrl) {
+    return configuredUrl.replace(/\/$/, '');
   }
 
   const currentPath = window.location.pathname || '/';
@@ -17,17 +16,18 @@ const getBaseUrl = () => {
 
 const BASE_URL = getBaseUrl();
 
-console.log("BASE_URL =", BASE_URL);
-
 async function request(endpoint) {
-  console.log("Fetching:", `${BASE_URL}${endpoint}`);
-
   const res = await fetch(`${BASE_URL}${endpoint}`);
 
-  console.log("Status:", res.status);
-
   if (!res.ok) {
-    throw new Error(await res.text());
+    const contentType = res.headers?.get?.('content-type') || '';
+    if (contentType.includes('application/json')) {
+      const body = await res.json();
+      throw new Error(body.error || `Request failed (${res.status})`);
+    }
+
+    const body = await res.text();
+    throw new Error(body || `Request failed (${res.status})`);
   }
 
   return res.json();
