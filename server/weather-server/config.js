@@ -13,7 +13,7 @@ module.exports = {
   cors: {
     origin:
       process.env.CORS_ORIGIN ||
-      'http://concproject-alb-1190008323.ap-south-1.elb.amazonaws.com',
+      'http://conc-reshma-frontend-2026.s3-website.ap-south-1.amazonaws.com',
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   },
